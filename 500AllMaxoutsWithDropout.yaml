@@ -1,5 +1,5 @@
  !obj:pylearn2.train.Train {
-    dataset: &train !obj:pylearn2.datasets.mjsynth.MJSYNTH {
+    dataset: !obj:pylearn2.datasets.mjsynth.MJSYNTH {
         which_set: 'train',
         numOfClasses: 10,
         numOfExamplesPerClass: 50
@@ -44,12 +44,18 @@
                               numOfExamplesPerClass: 10
                           }
             },
-        termination_criterion: !obj:pylearn2.termination_criteria.MonitorBased {
-                    channel_name: "valid_y_misclass",
+        termination_criterion: !obj:pylearn2.termination_criteria.And {
+            criteria: [
+                !obj:pylearn2.termination_criteria.MonitorBased {
+                    channel_name: "valid_objective",
                     prop_decrease: 0.,
-                    N: 20
+                    N: 100
                 },
-        },
-}
-
+                !obj:pylearn2.termination_criteria.EpochCounter {
+                    max_epochs: 500
+                }
+            ]
+        }
+    },
+}  
 
