@@ -22,7 +22,7 @@ class MJSYNTH(dense_design_matrix.DenseDesignMatrix):
 
 
     def __init__(self, which_set, numOfClasses,
-                 numOfExamplesPerClass, axes=('b', 0, 1, 'c')):
+                 numOfExamplesPerClass, axes=('c', 0, 1, 'b')):
         self.height = 32
         self.width = 100
         self.axes = axes
@@ -49,6 +49,7 @@ class MJSYNTH(dense_design_matrix.DenseDesignMatrix):
 
         view_converter = dense_design_matrix.DefaultViewConverter((self.height, self.width, 1),
                                                                    axes)
+
 
         super(MJSYNTH, self).__init__(X=MJSYNTH.cache_set_dict[which_set]['X'], y=MJSYNTH.cache_set_dict[which_set]['Y'], view_converter=view_converter,
                                        y_labels=MJSYNTH.cache_set_dict[which_set]['numOfClasses'])
@@ -129,7 +130,8 @@ class MJSYNTH(dense_design_matrix.DenseDesignMatrix):
         MJSYNTH.cache_set_dict[self.which_set]['X'] = X
         MJSYNTH.cache_set_dict[self.which_set]['Y'] = self.y
 
-    def is_in_cache(self, which_set, numOfClasses, numOfExamplesPerClass):
+    @staticmethod
+    def is_in_cache(which_set, numOfClasses, numOfExamplesPerClass):
         cache_set_dict = MJSYNTH.cache_set_dict[which_set]
-        if cache_set_dict[numOfClasses] == numOfClasses and cache_set_dict[numOfExamplesPerClass] == numOfExamplesPerClass and cache_set_dict['X'] != '':
+        if cache_set_dict['numOfClasses'] == numOfClasses and cache_set_dict['numOfExamplesPerClass'] == numOfExamplesPerClass and cache_set_dict['X'] != '':
             return True
