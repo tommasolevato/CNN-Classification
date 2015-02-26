@@ -130,6 +130,6 @@ class MJSYNTH(dense_design_matrix.DenseDesignMatrix):
         MJSYNTH.cache_set_dict[self.which_set]['Y'] = self.y
 
     def is_in_cache(self, which_set, numOfClasses, numOfExamplesPerClass):
-        cache_set_dict = MJSYNTH.cache_set_dict
+        cache_set_dict = MJSYNTH.cache_set_dict[which_set]
         if cache_set_dict[numOfClasses] == numOfClasses and cache_set_dict[numOfExamplesPerClass] == numOfExamplesPerClass and cache_set_dict['X'] != '':
             return True
