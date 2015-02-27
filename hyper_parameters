@@ -1,0 +1,9 @@
+norm_l1=0.07
+norm_l2=0.01
+norm_y=0.03
+init_l1=165
+init_l2=190
+irange_y=0.07
+l_r=0.01
+l1_prob=0.1:0.9:9
+l2_prob=0.1:0.9:9

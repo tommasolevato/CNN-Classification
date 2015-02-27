@@ -25,6 +25,17 @@ class Parser:
                 self.hyper_parameters_list[key] = num_of_elements
             else:
                 raise Exception("Sintax Error")
+            if "_prob" in key:
+                prefix = key.split("_")[0]
+                input_scales = prefix + "_input_scales"
+                input_scales_value = 1 / self.hyper_parameters[key]
+                self.hyper_parameters[input_scales] = input_scales_value
+                self.hyper_parameters_list[input_scales] = len(input_scales_value)
+
+                w_lr_scale = "w_scale_" + prefix
+                w_lr_scale_value = self.hyper_parameters[key]*self.hyper_parameters[key]
+                self.hyper_parameters[w_lr_scale] = w_lr_scale_value
+                self.hyper_parameters_list[w_lr_scale] = len(w_lr_scale_value)
         self.configuration_indexes = {}
         for key in self.hyper_parameters_list:
             self.configuration_indexes[key] = 0

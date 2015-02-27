@@ -1,8 +1,7 @@
 __author__ = 'tommaso'
 
-from mjsynth import MJSYNTH
+import numpy
 
-a = MJSYNTH('train', 25, 8)
-b = MJSYNTH('test', 50, 4)
-c = MJSYNTH('train', 25, 8)
-d = MJSYNTH('test', 50, 4)
+lin = numpy.linspace(1, 5, 5)
+a = lin *  lin
+print a
