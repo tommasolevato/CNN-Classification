@@ -22,10 +22,10 @@ p = Parser()
 
 
 while p.has_other_configurations():
-      with open('2MaxoutLayers240UnitsWithDropout.yaml', 'r') as f:
+      with open('ConvDropoutMomentum.yaml', 'r') as f:
           yaml_file = f.read()
       hyper_params = p.get_next_configuration()
-      outputFile = open('tests/' + output_file_string(hyper_params), 'w')
+      outputFile = open('tests/' + p.get_num_configuration, 'w')
 
       sys.stdout = outputFile
       sys.stderr = outputFile

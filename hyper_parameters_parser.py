@@ -29,6 +29,7 @@ class Parser:
         for key in self.hyper_parameters_list:
             self.configuration_indexes[key] = 0
         self.terminated = False
+        self.num_of_configuration = 0
 
     def get_next_configuration(self):
         dict = {}
@@ -46,6 +47,7 @@ class Parser:
                 w_lr_scale_value = dict[key]*dict[key]
                 dict[w_lr_scale] = w_lr_scale_value
         self.increase_index(key)
+        self.num_of_configuration += 1
         return dict
 
     def increase_index(self, key):
@@ -94,3 +96,6 @@ class Parser:
 
     def has_other_configurations(self):
         return not self.terminated
+
+    def get_num_configuration(self):
+        return self.num_of_configuration
