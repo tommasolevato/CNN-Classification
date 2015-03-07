@@ -43,7 +43,7 @@ class Parser:
                 input_scales_value = 1 / dict[key]
                 dict[input_scales] = input_scales_value
 
-                w_lr_scale = "w_scale_" + prefix
+                w_lr_scale = prefix + "_W_lr_scale"
                 w_lr_scale_value = dict[key]*dict[key]
                 dict[w_lr_scale] = w_lr_scale_value
         self.increase_index(key)
