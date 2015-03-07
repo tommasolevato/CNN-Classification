@@ -25,7 +25,7 @@ while p.has_other_configurations():
       with open('ConvDropoutMomentum.yaml', 'r') as f:
           yaml_file = f.read()
       hyper_params = p.get_next_configuration()
-      outputFile = open('tests/' + p.get_num_configuration, 'w')
+      outputFile = open('tests/' + p.get_num_configuration(), 'w')
 
       sys.stdout = outputFile
       sys.stderr = outputFile
