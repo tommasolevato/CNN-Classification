@@ -114,11 +114,15 @@ class MJSYNTH(dense_design_matrix.DenseDesignMatrix):
             data = Image.open(filename)
             data = data.resize([self.width, self.height])
             data = data.convert("L")
+            mean = numpy.mean(data)
+            std = numpy.std(data)
+            data = numpy.subtract(data, mean)
+            data = numpy.divide(data, std)
             labelTokens = filename.split("_")
             label = labelTokens[-1].split(".")[0]
             if label not in self.classes:
                 self.classes.append(label)
-            self.x[i, :] = list(data.getdata())
+            self.x[i, :] = data.reshape(1, self.height*self.width)
             labelList = []
             labelList.append(self.classes.index(label))
             tmp.append(labelList)
