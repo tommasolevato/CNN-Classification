@@ -1,1 +1,1 @@
-A python project for the recognition of text in natural images, based on the Pylearn2 framework. The classifier is a CNN with Dropout. The dataset is a reduced version (of parametric size) of the MJSynth dataset: http://www.robots.ox.ac.uk/~vgg/data/text/mjsynth.tar.gz
+A python project for the recognition of text in natural images, based on the Pylearn2 framework. The classifier is a CNN with Dropout. The dataset is the MJSynth dataset: http://www.robots.ox.ac.uk/~vgg/data/text/mjsynth.tar.gz
