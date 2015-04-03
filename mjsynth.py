@@ -10,17 +10,11 @@ from pylearn2.expr.preprocessing import global_contrast_normalize
 from pylearn2.utils import contains_nan
 from scipy import misc
 from PIL import Image
+from pylearn2.datasets.mjsynth.config import Config
+
 
 
 class MJSYNTH(dense_design_matrix.DenseDesignMatrix):
-    cache_set_dict = {
-        'train': {'numOfClasses': '', 'numOfExamplesPerClass': '', 'X': '', 'Y': ''},
-        'test': {'numOfClasses': '', 'numOfExamplesPerClass': '', 'X': '', 'Y': ''},
-        'valid': {'numOfClasses': '','numOfExamplesPerClass': '', 'X': '', 'Y': ''}
-    }
-
-
-
     def __init__(self, which_set, numOfClasses,
                  numOfExamplesPerClass, axes=('c', 0, 1, 'b')):
         self.height = 32
@@ -43,18 +37,18 @@ class MJSYNTH(dense_design_matrix.DenseDesignMatrix):
             self.fileToLoadFrom = "annotation_val.txt"
         else:
             raise ValueError("Set not recognized")
-        self.datapath = "/media/tommaso/Lacie/mnt/ramdisk/max/90kDICT32px/"
-
+        self.datapath = Config.getDatapath()
+        self.preprocess = Config.doPreprocess()
         self.loadData()
 
         view_converter = dense_design_matrix.DefaultViewConverter((self.height, self.width, 1),
                                                                    axes)
 
 
-        super(MJSYNTH, self).__init__(X=MJSYNTH.cache_set_dict[which_set]['X'], y=MJSYNTH.cache_set_dict[which_set]['Y'], view_converter=view_converter,
-                                       y_labels=MJSYNTH.cache_set_dict[which_set]['numOfClasses'])
+        super(MJSYNTH, self).__init__(X=numpy.cast['float32'](self.x), y=self.y, view_converter=view_converter,
+                                       y_labels=self.numOfClasses)
 
-        assert not contains_nan(MJSYNTH.cache_set_dict[which_set]['X'])
+        #assert not contains_nan(MJSYNTH.cache_set_dict[which_set]['X'])
 
     def findClasses(self):
         with open(self.datapath + "annotation_train.txt") as f:
@@ -77,65 +71,60 @@ class MJSYNTH(dense_design_matrix.DenseDesignMatrix):
                 try:
                     if self.examplesPerClassCount[exampleClass] < self.numOfExamplesPerClass:
                         self.examples.append(file[2:len(file)])
-                        self.examplesPerClassCount[exampleClass] +=1
-                    if len(self.examples) == self.numOfClasses*self.numOfExamplesPerClass:
+                        self.examplesPerClassCount[exampleClass] += 1
+                    if len(self.examples) == self.numOfClasses * self.numOfExamplesPerClass:
                         break
                 except KeyError:
                     pass
 
     def findOtherExamplesIfNeeded(self):
-        if len(self.examples) < self.numOfClasses*self.numOfExamplesPerClass:
+        if len(self.examples) < self.numOfClasses * self.numOfExamplesPerClass:
             with open(self.datapath + self.fileToLoadFrom) as f:
             	for line in f:
                 	exampleClass = line.split(" ")[1].rstrip()
                 	file = line.split(" ")[0].rstrip()
                 	if exampleClass in self.classes and file not in self.examples:
                     		self.examples.append(file[2:len(file)])
-                    		self.examplesPerClassCount[exampleClass] +=1
-                	if len(self.examples) == self.numOfClasses*self.numOfExamplesPerClass:
+                    		self.examplesPerClassCount[exampleClass] += 1
+                	if len(self.examples) == self.numOfClasses * self.numOfExamplesPerClass:
                         	break
-        assert len(self.examples) == self.numOfClasses*self.numOfExamplesPerClass
+        assert len(self.examples) == self.numOfClasses * self.numOfExamplesPerClass
 
 
     def loadData(self):
-        if not MJSYNTH.is_in_cache(self.which_set, self.numOfClasses, self.numOfExamplesPerClass):
-            self.findClasses()
-            self.findExamples()
-            self.findOtherExamplesIfNeeded()
-            self.loadImages()
+        self.findClasses()
+        self.findExamples()
+        self.findOtherExamplesIfNeeded()
+        self.loadImages()
 
 
     def loadImages(self):
-        i = 0
         self.x = numpy.zeros((len(self.examples), self.img_size), dtype=self.dtype)
+        i = 0
         tmp = []
         for example in self.examples:
             filename = self.datapath + example
-            data = Image.open(filename)
-            data = data.resize([self.width, self.height])
-            data = data.convert("L")
+            data = loadImage(filename)
+            classLabel = loadClassLabel(filename)
+            tmp.append(classLabel)
+            self.x[i, :] = data.reshape(1, self.height * self.width)
+            i += 1
+        self.y = numpy.array(tmp)
+        
+    def loadImage(self, filename):
+        data = Image.open(filename)
+        data = data.resize([self.width, self.height])
+        data = data.convert("L")
+        if self.preprocess:
             mean = numpy.mean(data)
             std = numpy.std(data)
             data = numpy.subtract(data, mean)
             data = numpy.divide(data, std)
-            labelTokens = filename.split("_")
-            label = labelTokens[-1].split(".")[0]
-            if label not in self.classes:
-                self.classes.append(label)
-            self.x[i, :] = data.reshape(1, self.height*self.width)
-            labelList = []
-            labelList.append(self.classes.index(label))
-            tmp.append(labelList)
-            i += 1
-        self.y = numpy.array(tmp)
-        X = numpy.cast['float32'](self.x)
-        MJSYNTH.cache_set_dict[self.which_set]['numOfClasses'] = self.numOfClasses
-        MJSYNTH.cache_set_dict[self.which_set]['numOfExamplesPerClass'] = self.numOfExamplesPerClass
-        MJSYNTH.cache_set_dict[self.which_set]['X'] = X
-        MJSYNTH.cache_set_dict[self.which_set]['Y'] = self.y
-
-    @staticmethod
-    def is_in_cache(which_set, numOfClasses, numOfExamplesPerClass):
-        cache_set_dict = MJSYNTH.cache_set_dict[which_set]
-        if cache_set_dict['numOfClasses'] == numOfClasses and cache_set_dict['numOfExamplesPerClass'] == numOfExamplesPerClass and cache_set_dict['X'] != '':
-            return True
+        return data
+        
+    def loadClassLabel(self, filename):
+        classLabelTokens = filename.split("_")
+        classLabel = classLabelTokens[-1].split(".")[0]
+        if classLabel not in self.classes:
+            self.classes.append(classLabel)
+        return self.classes.index(classLabel)

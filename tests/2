@@ -1,0 +1,175 @@
+!obj:pylearn2.train.Train {
+    dataset: &train !obj:pylearn2.datasets.mjsynth.MJSYNTH {
+        which_set : 'train',
+        numOfClasses: 10,
+        numOfExamplesPerClass: 10
+    },
+    model: !obj:pylearn2.models.mlp.MLP {
+        input_space: !obj:pylearn2.space.Conv2DSpace {
+            shape: [32, 100],
+            num_channels: 1
+        },
+        layers: [ !obj:pylearn2.models.mlp.ConvRectifiedLinear {
+                     layer_name: 'c1',
+                     output_channels: 64,
+                     irange: 0.100000,
+                     kernel_shape: [5, 5],
+                     pool_shape: [2, 2],
+                     pool_stride: [2, 2],
+                     max_kernel_norm: 0.500000,
+                     W_lr_scale: 0.810000,
+                     border_mode: full
+                 }, !obj:pylearn2.models.mlp.ConvRectifiedLinear {
+                     layer_name: 'c2',
+                     output_channels: 128,
+                     irange: 0.100000,
+                     kernel_shape: [5, 5],
+                     pool_shape: [2, 2],
+                     pool_stride: [2, 2],
+                     max_kernel_norm: 0.500000,
+                     W_lr_scale: 0.640000
+                 }, !obj:pylearn2.models.mlp.ConvRectifiedLinear {
+                     layer_name: 'c3',
+                     output_channels: 256,
+                     irange: 0.100000,
+                     kernel_shape: [3, 3],
+                     pool_shape: [2, 2],
+                     pool_stride: [2, 2],
+                     max_kernel_norm: 0.500000,
+                     W_lr_scale: 0.490000
+                 }, !obj:pylearn2.models.mlp.ConvRectifiedLinear {
+                     layer_name: 'c4',
+                     output_channels: 512,
+                     irange: 0.100000,
+                     kernel_shape: [3, 3],
+                     pool_shape: [1, 1],
+                     pool_stride: [1, 1],
+                     max_kernel_norm: 0.500000,
+                     W_lr_scale: 0.360000
+                 },  !obj:pylearn2.models.mlp.RectifiedLinear {
+                     layer_name: 'rl',
+                     dim: 4096,
+                     sparse_init: 2048,
+                     W_lr_scale: 0.250000,
+                     max_col_norm: 0.500000
+                 }, !obj:pylearn2.models.mlp.Softmax {
+                     max_col_norm: 0.500000,
+                     layer_name: 'y',
+                     n_classes: 10,
+                     irange: 0.100000
+                 }
+                ],
+    },
+    algorithm: !obj:pylearn2.training_algorithms.sgd.SGD {
+        batch_size: 50,
+        learning_rate: 0.200000,
+        learning_rule: !obj:pylearn2.training_algorithms.learning_rule.Momentum {
+            init_momentum: 0.500000
+        },
+        monitoring_dataset:
+            {
+                'train' : !obj:pylearn2.datasets.mjsynth.MJSYNTH {
+                              which_set : 'train',
+                              numOfClasses: 10,
+                              numOfExamplesPerClass: 10
+                          },
+                'valid'  : !obj:pylearn2.datasets.mjsynth.MJSYNTH {
+                              which_set : 'valid',
+                              numOfClasses: 10,
+                              numOfExamplesPerClass: 10
+                          }
+            },
+        cost: !obj:pylearn2.costs.mlp.dropout.Dropout {
+            input_include_probs: { 'c1' : 0.900000,
+                                   'c2' : 0.800000,
+                                   'c3' : 0.700000,
+                                   'c4' : 0.600000,
+                                   'rl' : 0.500000
+                                 },
+            input_scales: { 'c1': 1.111111,
+                            'c2': 1.250000,
+                            'c3': 1.428571,
+                            'c4': 1.666667,
+                            'rl': 2.000000
+                          }
+        },
+        termination_criterion: !obj:pylearn2.termination_criteria.And {
+            criteria: [
+                !obj:pylearn2.termination_criteria.MonitorBased {
+                    channel_name: "valid_y_misclass",
+                    prop_decrease: 0.,
+                    N: 1000
+                },
+                !obj:pylearn2.termination_criteria.EpochCounter {
+                    max_epochs: 1000
+                },
+            ]
+        },
+    },
+    extensions:
+        [ !obj:pylearn2.training_algorithms.learning_rule.MomentumAdjustor {
+            start: 1,
+            saturate: 750,
+            final_momentum: 0.900000
+        },
+        !obj:pylearn2.training_algorithms.sgd.LinearDecayOverEpoch {
+            start: 1,
+            saturate: 750,
+            decay_factor: 0.010000
+        }
+    ]
+}
+
+Traceback (most recent call last):
+  File "hyper_parameters_test.py", line 38, in <module>
+    
+  File "/home/tommaso/pylearn2/pylearn2/config/yaml_parse.py", line 211, in load
+    proxy_graph = yaml.load(string, **kwargs)
+  File "/home/tommaso/Canopy_64bit/User/lib/python2.7/site-packages/PyYAML-3.11-py2.7-linux-x86_64.egg/yaml/__init__.py", line 71, in load
+    return loader.get_single_data()
+  File "/home/tommaso/Canopy_64bit/User/lib/python2.7/site-packages/PyYAML-3.11-py2.7-linux-x86_64.egg/yaml/constructor.py", line 39, in get_single_data
+    return self.construct_document(node)
+  File "/home/tommaso/Canopy_64bit/User/lib/python2.7/site-packages/PyYAML-3.11-py2.7-linux-x86_64.egg/yaml/constructor.py", line 48, in construct_document
+    for dummy in generator:
+  File "/home/tommaso/Canopy_64bit/User/lib/python2.7/site-packages/PyYAML-3.11-py2.7-linux-x86_64.egg/yaml/constructor.py", line 393, in construct_yaml_seq
+    data.extend(self.construct_sequence(node))
+  File "/home/tommaso/Canopy_64bit/User/lib/python2.7/site-packages/PyYAML-3.11-py2.7-linux-x86_64.egg/yaml/constructor.py", line 118, in construct_sequence
+    for child in node.value]
+  File "/home/tommaso/Canopy_64bit/User/lib/python2.7/site-packages/PyYAML-3.11-py2.7-linux-x86_64.egg/yaml/constructor.py", line 90, in construct_object
+    data = constructor(self, tag_suffix, node)
+  File "/home/tommaso/pylearn2/pylearn2/config/yaml_parse.py", line 356, in multi_constructor_obj
+    yaml_src = yaml.serialize(node)
+  File "/home/tommaso/Canopy_64bit/User/lib/python2.7/site-packages/PyYAML-3.11-py2.7-linux-x86_64.egg/yaml/__init__.py", line 161, in serialize
+    return serialize_all([node], stream, Dumper=Dumper, **kwds)
+  File "/home/tommaso/Canopy_64bit/User/lib/python2.7/site-packages/PyYAML-3.11-py2.7-linux-x86_64.egg/yaml/__init__.py", line 149, in serialize_all
+    dumper.serialize(node)
+  File "/home/tommaso/Canopy_64bit/User/lib/python2.7/site-packages/PyYAML-3.11-py2.7-linux-x86_64.egg/yaml/serializer.py", line 54, in serialize
+    self.serialize_node(node, None, None)
+  File "/home/tommaso/Canopy_64bit/User/lib/python2.7/site-packages/PyYAML-3.11-py2.7-linux-x86_64.egg/yaml/serializer.py", line 107, in serialize_node
+    self.serialize_node(key, node, None)
+  File "/home/tommaso/Canopy_64bit/User/lib/python2.7/site-packages/PyYAML-3.11-py2.7-linux-x86_64.egg/yaml/serializer.py", line 90, in serialize_node
+    style=node.style))
+  File "/home/tommaso/Canopy_64bit/User/lib/python2.7/site-packages/PyYAML-3.11-py2.7-linux-x86_64.egg/yaml/emitter.py", line 115, in emit
+    self.state()
+  File "/home/tommaso/Canopy_64bit/User/lib/python2.7/site-packages/PyYAML-3.11-py2.7-linux-x86_64.egg/yaml/emitter.py", line 349, in expect_flow_mapping_key
+    self.expect_node(mapping=True, simple_key=True)
+  File "/home/tommaso/Canopy_64bit/User/lib/python2.7/site-packages/PyYAML-3.11-py2.7-linux-x86_64.egg/yaml/emitter.py", line 243, in expect_node
+    self.process_tag()
+  File "/home/tommaso/Canopy_64bit/User/lib/python2.7/site-packages/PyYAML-3.11-py2.7-linux-x86_64.egg/yaml/emitter.py", line 474, in process_tag
+    self.style = self.choose_scalar_style()
+  File "/home/tommaso/Canopy_64bit/User/lib/python2.7/site-packages/PyYAML-3.11-py2.7-linux-x86_64.egg/yaml/emitter.py", line 503, in choose_scalar_style
+    and (self.flow_level and self.analysis.allow_flow_plain
+KeyboardInterrupt
+Error in atexit._run_exitfuncs:
+Traceback (most recent call last):
+  File "/home/tommaso/Canopy/appdata/canopy-1.5.1.2730.rh5-x86_64/lib/python2.7/atexit.py", line 24, in _run_exitfuncs
+    func(*targs, **kargs)
+  File "/home/tommaso/Canopy_64bit/User/lib/python2.7/site-packages/theano/gof/cmodule.py", line 1324, in _on_atexit
+    self.clear_old()
+  File "/home/tommaso/Canopy_64bit/User/lib/python2.7/site-packages/theano/gof/cmodule.py", line 1178, in clear_old
+    ignore_nocleanup=True)
+  File "/home/tommaso/Canopy_64bit/User/lib/python2.7/site-packages/theano/gof/cmodule.py", line 1344, in _rmtree
+    shutil.rmtree(parent)
+  File "/home/tommaso/Canopy/appdata/canopy-1.5.1.2730.rh5-x86_64/lib/python2.7/shutil.py", line 250, in rmtree
+    os.remove(fullname)
+KeyboardInterrupt

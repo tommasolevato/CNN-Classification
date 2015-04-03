@@ -1,7 +1,6 @@
 # coding=utf-8
 __author__ = 'Tommaso Levato'
 
-
 from os import walk
 
 bestFile = ''
