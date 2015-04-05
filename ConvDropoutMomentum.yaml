@@ -1,8 +1,8 @@
 !obj:pylearn2.train.Train {
-    dataset: &train !obj:pylearn2.datasets.mjsynth.mjsynth.MJSYNTH {
+    dataset: &train !obj:pylearn2.datasets.mjsynth.MJSYNTH {
         which_set : 'train',
-        numOfClasses: 2,
-        numOfExamplesPerClass: 5
+        numOfClasses: 10,
+        numOfExamplesPerClass: 10
     },
     model: !obj:pylearn2.models.mlp.MLP {
         input_space: !obj:pylearn2.space.Conv2DSpace {
@@ -27,8 +27,7 @@
                      pool_shape: [2, 2],
                      pool_stride: [2, 2],
                      max_kernel_norm: %(c2_max_kernel_norm)f,
-                     W_lr_scale: %(c2_W_lr_scale)f,
-                     border_mode: full
+                     W_lr_scale: %(c2_W_lr_scale)f
                  }, !obj:pylearn2.models.mlp.ConvRectifiedLinear {
                      layer_name: 'c3',
                      output_channels: 256,
@@ -37,8 +36,7 @@
                      pool_shape: [2, 2],
                      pool_stride: [2, 2],
                      max_kernel_norm: %(c3_max_kernel_norm)f,
-                     W_lr_scale: %(c3_W_lr_scale)f,
-                     border_mode: full
+                     W_lr_scale: %(c3_W_lr_scale)f
                  }, !obj:pylearn2.models.mlp.ConvRectifiedLinear {
                      layer_name: 'c4',
                      output_channels: 512,
@@ -47,8 +45,7 @@
                      pool_shape: [1, 1],
                      pool_stride: [1, 1],
                      max_kernel_norm: %(c4_max_kernel_norm)f,
-                     W_lr_scale: %(c4_W_lr_scale)f,
-                     border_mode: full
+                     W_lr_scale: %(c4_W_lr_scale)f
                  },  !obj:pylearn2.models.mlp.RectifiedLinear {
                      layer_name: 'rl',
                      dim: 4096,
@@ -58,28 +55,28 @@
                  }, !obj:pylearn2.models.mlp.Softmax {
                      max_col_norm: %(y_max_col_norm)f,
                      layer_name: 'y',
-                     n_classes: 2,
+                     n_classes: 10,
                      irange: %(y_irange)f
                  }
                 ],
     },
     algorithm: !obj:pylearn2.training_algorithms.sgd.SGD {
-        batch_size: 5,
+        batch_size: 50,
         learning_rate: %(lr)f,
         learning_rule: !obj:pylearn2.training_algorithms.learning_rule.Momentum {
             init_momentum: %(init_momentum)f
         },
         monitoring_dataset:
             {
-                'train' : !obj:pylearn2.datasets.mjsynth.mjsynth.MJSYNTH {
+                'train' : !obj:pylearn2.datasets.mjsynth.MJSYNTH {
                               which_set : 'train',
-                              numOfClasses: 2,
-                              numOfExamplesPerClass: 5
+                              numOfClasses: 10,
+                              numOfExamplesPerClass: 10
                           },
-                'valid'  : !obj:pylearn2.datasets.mjsynth.mjsynth.MJSYNTH {
+                'valid'  : !obj:pylearn2.datasets.mjsynth.MJSYNTH {
                               which_set : 'valid',
-                              numOfClasses: 2,
-                              numOfExamplesPerClass: 5
+                              numOfClasses: 10,
+                              numOfExamplesPerClass: 10
                           }
             },
         cost: !obj:pylearn2.costs.mlp.dropout.Dropout {
@@ -101,10 +98,10 @@
                 !obj:pylearn2.termination_criteria.MonitorBased {
                     channel_name: "valid_y_misclass",
                     prop_decrease: 0.,
-                    N: 50
+                    N: 1000
                 },
                 !obj:pylearn2.termination_criteria.EpochCounter {
-                    max_epochs: 50
+                    max_epochs: 1000
                 },
             ]
         },

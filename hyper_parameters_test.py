@@ -9,7 +9,8 @@ import sys
 from hyper_parameters_parser import Parser
 
 from pylearn2.config import yaml_parse
-from pylearn2.datasets.mjsynth import MJSYNTH
+from pylearn2.datasets.mjsynth.mjsynth import MJSYNTH
+from pylearn2.datasets.mjsynth.config import Config
 
 
 def output_file_string(params):
@@ -18,11 +19,12 @@ def output_file_string(params):
         string.append(key + ": " + str(params[key]))
     return ' '.join(string)
 
+
 p = Parser()
 
 
 while p.has_other_configurations():
-      with open('ConvDropoutMomentum.yaml', 'r') as f:
+      with open(Config.getYamlFilename(), 'r') as f:
           yaml_file = f.read()
       hyper_params = p.get_next_configuration()
       outputFile = open('tests/' + p.get_num_configuration().__str__(), 'w')
