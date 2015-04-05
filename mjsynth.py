@@ -128,4 +128,6 @@ class MJSYNTH(dense_design_matrix.DenseDesignMatrix):
         classLabel = classLabelTokens[-1].split(".")[0]
         if classLabel not in self.classes:
             self.classes.append(classLabel)
-        return self.classes.index(classLabel)
+        tmp = []
+        tmp.append(self.classes.index(classLabel))
+        return tmp

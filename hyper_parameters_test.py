@@ -39,5 +39,5 @@ while p.has_other_configurations():
 
       try:
           train.main_loop()
-      except:
-          pass
+      except Exception as e:
+          print e
