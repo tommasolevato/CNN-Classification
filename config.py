@@ -9,7 +9,7 @@ class Config():
           
     @staticmethod
     def getDatapath():
-        return Config.dict["datapath"]
+        return Config.dict["datapath"].rstrip()
     
     @staticmethod
     def doPreprocess():
@@ -17,4 +17,4 @@ class Config():
     
     @staticmethod
     def getYamlFilename():
-        return Config.dict["yaml"] + ".yaml"
+        return Config.dict["yaml"].rstrip() + ".yaml"

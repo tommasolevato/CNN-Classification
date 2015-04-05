@@ -104,8 +104,8 @@ class MJSYNTH(dense_design_matrix.DenseDesignMatrix):
         tmp = []
         for example in self.examples:
             filename = self.datapath + example
-            data = loadImage(filename)
-            classLabel = loadClassLabel(filename)
+            data = self.loadImage(filename)
+            classLabel = self.loadClassLabel(filename)
             tmp.append(classLabel)
             self.x[i, :] = data.reshape(1, self.height * self.width)
             i += 1
@@ -115,6 +115,7 @@ class MJSYNTH(dense_design_matrix.DenseDesignMatrix):
         data = Image.open(filename)
         data = data.resize([self.width, self.height])
         data = data.convert("L")
+        data = numpy.array(data)
         if self.preprocess:
             mean = numpy.mean(data)
             std = numpy.std(data)

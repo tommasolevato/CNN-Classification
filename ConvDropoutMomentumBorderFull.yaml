@@ -1,8 +1,8 @@
 !obj:pylearn2.train.Train {
-    dataset: &train !obj:pylearn2.datasets.mjsynth.MJSYNTH {
+    dataset: &train !obj:pylearn2.datasets.mjsynth.mjsynth.MJSYNTH {
         which_set : 'train',
-        numOfClasses: 125,
-        numOfExamplesPerClass: 75
+        numOfClasses: 2,
+        numOfExamplesPerClass: 5
     },
     model: !obj:pylearn2.models.mlp.MLP {
         input_space: !obj:pylearn2.space.Conv2DSpace {
@@ -58,28 +58,28 @@
                  }, !obj:pylearn2.models.mlp.Softmax {
                      max_col_norm: %(y_max_col_norm)f,
                      layer_name: 'y',
-                     n_classes: 125,
+                     n_classes: 2,
                      irange: %(y_irange)f
                  }
                 ],
     },
     algorithm: !obj:pylearn2.training_algorithms.sgd.SGD {
-        batch_size: 50,
+        batch_size: 5,
         learning_rate: %(lr)f,
         learning_rule: !obj:pylearn2.training_algorithms.learning_rule.Momentum {
             init_momentum: %(init_momentum)f
         },
         monitoring_dataset:
             {
-                'train' : !obj:pylearn2.datasets.mjsynth.MJSYNTH {
+                'train' : !obj:pylearn2.datasets.mjsynth.mjsynth.MJSYNTH {
                               which_set : 'train',
-                              numOfClasses: 125,
-                              numOfExamplesPerClass: 75
+                              numOfClasses: 2,
+                              numOfExamplesPerClass: 5
                           },
-                'valid'  : !obj:pylearn2.datasets.mjsynth.MJSYNTH {
+                'valid'  : !obj:pylearn2.datasets.mjsynth.mjsynth.MJSYNTH {
                               which_set : 'valid',
-                              numOfClasses: 125,
-                              numOfExamplesPerClass: 15
+                              numOfClasses: 2,
+                              numOfExamplesPerClass: 5
                           }
             },
         cost: !obj:pylearn2.costs.mlp.dropout.Dropout {
@@ -101,10 +101,10 @@
                 !obj:pylearn2.termination_criteria.MonitorBased {
                     channel_name: "valid_y_misclass",
                     prop_decrease: 0.,
-                    N: 200
+                    N: 50
                 },
                 !obj:pylearn2.termination_criteria.EpochCounter {
-                    max_epochs: 200
+                    max_epochs: 50
                 },
             ]
         },
