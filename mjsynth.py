@@ -128,5 +128,5 @@ class MJSYNTH(dense_design_matrix.DenseDesignMatrix):
         classLabel = classLabelTokens[-1].split(".")[0]
         assert classLabel in MJSYNTH.classes
         tmp = []
-        tmp.append(self.classes.index(classLabel))
+        tmp.append(MJSYNTH.classes.index(classLabel))
         return tmp
