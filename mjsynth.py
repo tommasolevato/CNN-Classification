@@ -4,6 +4,7 @@ __author__ = 'Tommaso Levato'
 import logging
 
 import numpy
+import random
 
 from pylearn2.datasets import cache, dense_design_matrix
 from pylearn2.expr.preprocessing import global_contrast_normalize
@@ -40,6 +41,7 @@ class MJSYNTH(dense_design_matrix.DenseDesignMatrix):
         self.datapath = Config.getDatapath()
         self.preprocess = Config.doPreprocess()
         self.loadData()
+        random.seed()
 
         view_converter = dense_design_matrix.DefaultViewConverter((self.height, self.width, 1),
                                                                    axes)
@@ -51,17 +53,15 @@ class MJSYNTH(dense_design_matrix.DenseDesignMatrix):
         #assert not contains_nan(MJSYNTH.cache_set_dict[which_set]['X'])
 
     def findClasses(self):
-        with open(self.datapath + "annotation_train.txt") as f:
-            for line in f:
-                exampleClass = line.split(" ")[1].rstrip()
-                if exampleClass not in self.classes:
-                    self.classes.append(exampleClass)
-                if len(self.classes) == self.numOfClasses:
-                    break
+        assert self.numOfClasses <= 88172
+        while len(self.classes) < self.numOfClasses:
+            randomClass = random.randint(0, 88171)
+            if randomClass not in self.classes:
+                self.classes.append(randomClass)
+        assert len(self.classes) == self.numOfClasses
 
     def findExamples(self):
         for classToInitialize in self.classes:
-            self.examplesPerClassCount[classToInitialize] = 0
             self.examplesPerClassCount[classToInitialize] = 0
 
         with open(self.datapath + self.fileToLoadFrom) as f:
@@ -90,13 +90,11 @@ class MJSYNTH(dense_design_matrix.DenseDesignMatrix):
                         	break
         assert len(self.examples) == self.numOfClasses * self.numOfExamplesPerClass
 
-
     def loadData(self):
         self.findClasses()
         self.findExamples()
         self.findOtherExamplesIfNeeded()
         self.loadImages()
-
 
     def loadImages(self):
         self.x = numpy.zeros((len(self.examples), self.img_size), dtype=self.dtype)
