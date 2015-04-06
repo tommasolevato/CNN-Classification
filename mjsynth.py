@@ -126,8 +126,7 @@ class MJSYNTH(dense_design_matrix.DenseDesignMatrix):
     def loadClassLabel(self, filename):
         classLabelTokens = filename.split("_")
         classLabel = classLabelTokens[-1].split(".")[0]
-        if classLabel not in self.classes:
-            self.classes.append(classLabel)
+        assert classLabel in MJSYNTH.classes
         tmp = []
         tmp.append(self.classes.index(classLabel))
         return tmp
