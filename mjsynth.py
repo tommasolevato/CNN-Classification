@@ -16,6 +16,8 @@ from pylearn2.datasets.mjsynth.config import Config
 
 
 class MJSYNTH(dense_design_matrix.DenseDesignMatrix):
+    classes = []
+    
     def __init__(self, which_set, numOfClasses,
                  numOfExamplesPerClass, axes=('c', 0, 1, 'b')):
         self.height = 32
@@ -27,7 +29,6 @@ class MJSYNTH(dense_design_matrix.DenseDesignMatrix):
         self.img_size = numpy.prod(self.img_shape)
         self.numOfClasses = numOfClasses
         self.numOfExamplesPerClass = numOfExamplesPerClass
-        self.classes = []
         self.examplesPerClassCount = {}
         self.which_set = which_set
         if which_set == "train":
@@ -54,14 +55,14 @@ class MJSYNTH(dense_design_matrix.DenseDesignMatrix):
 
     def findClasses(self):
         assert self.numOfClasses <= 88172
-        while len(self.classes) < self.numOfClasses:
+        while len(MJSYNTH.classes) < self.numOfClasses:
             randomClass = random.randint(0, 88171)
-            if randomClass not in self.classes:
-                self.classes.append(randomClass)
-        assert len(self.classes) == self.numOfClasses
+            if randomClass not in MJSYNTH.classes:
+                MJSYNTH.classes.append(randomClass.__str__())
+        assert len(MJSYNTH.classes) == self.numOfClasses
 
     def findExamples(self):
-        for classToInitialize in self.classes:
+        for classToInitialize in MJSYNTH.classes:
             self.examplesPerClassCount[classToInitialize] = 0
 
         with open(self.datapath + self.fileToLoadFrom) as f:
@@ -83,7 +84,7 @@ class MJSYNTH(dense_design_matrix.DenseDesignMatrix):
             	for line in f:
                 	exampleClass = line.split(" ")[1].rstrip()
                 	file = line.split(" ")[0].rstrip()
-                	if exampleClass in self.classes and file not in self.examples:
+                	if exampleClass in MJSYNTH.classes and file not in self.examples:
                     		self.examples.append(file[2:len(file)])
                     		self.examplesPerClassCount[exampleClass] += 1
                 	if len(self.examples) == self.numOfClasses * self.numOfExamplesPerClass:
@@ -91,7 +92,8 @@ class MJSYNTH(dense_design_matrix.DenseDesignMatrix):
         assert len(self.examples) == self.numOfClasses * self.numOfExamplesPerClass
 
     def loadData(self):
-        self.findClasses()
+        if MJSYNTH.classes == []:
+            self.findClasses()
         self.findExamples()
         self.findOtherExamplesIfNeeded()
         self.loadImages()
