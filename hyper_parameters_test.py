@@ -2,6 +2,7 @@
 __author__ = 'Tommaso Levato'
 
 
+import yaml
 import numpy
 import os
 import pylearn2
