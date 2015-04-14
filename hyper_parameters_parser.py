@@ -89,7 +89,7 @@ class Parser:
 
     def parse_token(self, token):
         if '.' in token:
-            return round(float(token),2)
+            return round(float(token),8)
         else:
             return int(token)
         raise Exception
