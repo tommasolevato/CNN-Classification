@@ -1,10 +1,12 @@
 # coding=utf-8
+from os.path import isfile
 __author__ = 'Tommaso Levato'
 
 import logging
 
 import numpy
 import random
+import os.path
 
 from pylearn2.datasets import cache, dense_design_matrix
 from pylearn2.expr.preprocessing import global_contrast_normalize
@@ -112,16 +114,19 @@ class MJSYNTH(dense_design_matrix.DenseDesignMatrix):
         self.y = numpy.array(tmp)
         
     def loadImage(self, filename):
-        data = Image.open(filename)
-        data = data.resize([self.width, self.height])
-        data = data.convert("L")
-        data = numpy.array(data)
-        if self.preprocess:
-            mean = numpy.mean(data)
-            std = numpy.std(data)
-            data = numpy.subtract(data, mean)
-            data = numpy.divide(data, std)
-        return data
+        if not isfile(filename):
+            print filename + "does not exist"
+        else:
+            data = Image.open(filename)
+            data = data.resize([self.width, self.height])
+            data = data.convert("L")
+            data = numpy.array(data)
+            if self.preprocess:
+                mean = numpy.mean(data)
+                std = numpy.std(data)
+                data = numpy.subtract(data, mean)
+                data = numpy.divide(data, std)
+            return data
         
     def loadClassLabel(self, filename):
         classLabelTokens = filename.split("_")
